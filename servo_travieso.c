@@ -1,15 +1,70 @@
+// CONFIG1L
+#pragma config PLLDIV = 1        // PLL Prescaler Selection bits (No prescale (4 MHz oscillator input drives PLL directly))
+#pragma config CPUDIV = OSC1_PLL2// System Clock Postscaler Selection bits ([Primary Oscillator Src: /1][96 MHz PLL Src: /2])
+#pragma config USBDIV = 1        // USB Clock Selection bit (used in Full-Speed USB mode only; UCFG:FSEN = 1) (USB clock source comes directly from the primary oscillator block with no postscale)
+
+// CONFIG1H
+#pragma config FOSC = HS         // Oscillator Selection bits (HS oscillator (HS))
+#pragma config FCMEN = OFF       // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
+#pragma config IESO = OFF        // Internal/External Oscillator Switchover bit (Oscillator Switchover mode disabled)
+
+// CONFIG2L
+#pragma config PWRT = OFF        // Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOR = OFF         // Brown-out Reset Enable bits (Brown-out Reset disabled in hardware and software)
+#pragma config BORV = 3          // Brown-out Reset Voltage bits (Minimum setting 2.05V)
+#pragma config VREGEN = OFF      // USB Voltage Regulator Enable bit (USB voltage regulator disabled)
+
+// CONFIG2H
+#pragma config WDT = OFF         // Watchdog Timer Enable bit (WDT disabled (control is placed on the SWDTEN bit))
+#pragma config WDTPS = 32768     // Watchdog Timer Postscale Select bits (1:32768)
+
+// CONFIG3H
+#pragma config CCP2MX = OFF      // CCP2 MUX bit (CCP2 input/output is multiplexed with RB3)
+#pragma config PBADEN = OFF      // PORTB A/D Enable bit (PORTB<4:0> pins are configured as digital I/O on Reset)
+#pragma config LPT1OSC = OFF     // Low-Power Timer 1 Oscillator Enable bit (Timer1 configured for higher power operation)
+#pragma config MCLRE = ON        // MCLR Pin Enable bit (MCLR pin enabled; RE3 input pin disabled)
+
+// CONFIG4L
+#pragma config STVREN = OFF      // Stack Full/Underflow Reset Enable bit (Stack full/underflow will not cause Reset)
+#pragma config LVP = OFF         // Single-Supply ICSP Enable bit (Single-Supply ICSP disabled)
+#pragma config ICPRT = OFF       // Dedicated In-Circuit Debug/Programming Port (ICPORT) Enable bit (ICPORT disabled)
+#pragma config XINST = OFF       // Extended Instruction Set Enable bit (Instruction set extension and Indexed Addressing mode disabled (Legacy mode))
+
+// CONFIG5L
+#pragma config CP0 = OFF         // Code Protection bit (Block 0 (000800-001FFFh) is not code-protected)
+#pragma config CP1 = OFF         // Code Protection bit (Block 1 (002000-003FFFh) is not code-protected)
+#pragma config CP2 = OFF         // Code Protection bit (Block 2 (004000-005FFFh) is not code-protected)
+#pragma config CP3 = OFF         // Code Protection bit (Block 3 (006000-007FFFh) is not code-protected)
+
+// CONFIG5H
+#pragma config CPB = OFF         // Boot Block Code Protection bit (Boot block (000000-0007FFh) is not code-protected)
+#pragma config CPD = OFF         // Data EEPROM Code Protection bit (Data EEPROM is not code-protected)
+
+// CONFIG6L
+#pragma config WRT0 = OFF        // Write Protection bit (Block 0 (000800-001FFFh) is not write-protected)
+#pragma config WRT1 = OFF        // Write Protection bit (Block 1 (002000-003FFFh) is not write-protected)
+#pragma config WRT2 = OFF        // Write Protection bit (Block 2 (004000-005FFFh) is not write-protected)
+#pragma config WRT3 = OFF        // Write Protection bit (Block 3 (006000-007FFFh) is not write-protected)
+
+// CONFIG6H
+#pragma config WRTC = OFF        // Configuration Register Write Protection bit (Configuration registers (300000-3000FFh) are not write-protected)
+#pragma config WRTB = OFF        // Boot Block Write Protection bit (Boot block (000000-0007FFh) is not write-protected)
+#pragma config WRTD = OFF        // Data EEPROM Write Protection bit (Data EEPROM is not write-protected)
+
+// CONFIG7L
+#pragma config EBTR0 = OFF       // Table Read Protection bit (Block 0 (000800-001FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR1 = OFF       // Table Read Protection bit (Block 1 (002000-003FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR2 = OFF       // Table Read Protection bit (Block 2 (004000-005FFFh) is not protected from table reads executed in other blocks)
+#pragma config EBTR3 = OFF       // Table Read Protection bit (Block 3 (006000-007FFFh) is not protected from table reads executed in other blocks)
+
+// CONFIG7H
+#pragma config EBTRB = OFF       // Boot Block Table Read Protection bit (Boot block (000000-0007FFh) is not protected from table reads executed in other blocks)
+
 #include <xc.h>
 
 #define _XTAL_FREQ 16000000
 
-//================ CONFIG BITS ================
-#pragma config FOSC = HS        // Oscilador HS
-#pragma config PLLDIV = 1
-#pragma config CPUDIV = OSC1_PLL2
-#pragma config WDT = OFF
-#pragma config LVP = OFF
-#pragma config PBADEN = OFF
-#pragma config MCLRE = ON
+
 //=============================================
 
 // Sensores
@@ -18,9 +73,9 @@
 
 // LEDs
 
-#define Coca   RB1 // Salida
-#define Garrafon   RB2 // Salida
-#define Paro   RB3 // Salida
+#define Coca     LATBbits.LATB1 // Salida corregida
+#define Garrafon   LATBbits.LATB2 // Salida corregida
+#define Paro     LATBbits.LATB3 // Salida corregida
 
 //Paro 
 
@@ -31,9 +86,9 @@ void Init_Ports(void)
     // Todo digital
     ADCON1 = 0x0F;
 
-    // Servo en RB0
-    TRISBbits.TRISB0 = 0;
-    LATBbits.LATB0 = 0;
+    // Servo en RB4
+    TRISBbits.TRISB4 = 0;
+    LATBbits.LATB4 = 0;
 
     // Botones en RD0 y RD1
     TRISDbits.TRISD0 = 1;
@@ -48,29 +103,29 @@ void Init_Ports(void)
     TRISDbits.TRISD2 = 1;  // Entrada (paro de emergencia)
 }
 
-void Servo_0(void)
+void Servo_coca(void)
 {
-    LATBbits.LATB0 = 1;
+    LATBbits.LATB4 = 1;
     
-    __delay_us(1000);      // Aproximadamente 45°
-    LATBbits.LATB0 = 0;
-    __delay_us(20000);     // Completa 20 ms
+    __delay_us(1950);      // Aproximadamente 45°
+    LATBbits.LATB4= 0;
+    __delay_us(18050);     // Completa 20 ms
 }
 
-void Servo_30(void)
+void Servo_garrafon(void)
 {
-    LATBbits.LATB0 = 1;
+    LATBbits.LATB4 = 1;
     
-    __delay_us(1166);      // Aproximadamente 45°
-    LATBbits.LATB0 = 0;
-    __delay_us(18834);     // Completa 20 ms
+    __delay_us(2220);      // Aproximadamente 45°
+    LATBbits.LATB4 = 0;
+    __delay_us(17780);     // Completa 20 ms
 }
 
-void Servo_60(void)
+void Servo_default(void)
 {
-    LATBbits.LATB0 = 1;
+    LATBbits.LATB4 = 1;
     __delay_us(1500);      // Aproximadamente 90°
-    LATBbits.LATB0 = 0;
+    LATBbits.LATB4 = 0;
     __delay_us(18500);     // Completa 20 ms
 }
 
@@ -82,7 +137,7 @@ void delay_astuto(void) //esta función sirve para evitar que una tapa de garrafó
 
     for(i = 0; i < 100; i++)
     {
-        Servo_0();      // genera un periodo de 20 ms
+        Servo_garrafon();      // Corregido: Llamaba a Servo_0() que no existía
     }
 }
 
@@ -146,15 +201,15 @@ int main(void)
 
         if(posicion_actual == 'A')
         {
-            Servo_30();
+            Servo_coca();
         }
         else if(posicion_actual == 'B')
         {
-            Servo_0();
+            Servo_garrafon();
         }
         else
         {
-            Servo_60();
+            Servo_default();
         }
         
     }
