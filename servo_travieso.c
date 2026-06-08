@@ -103,12 +103,12 @@ void secuencia_alto(void){
 }
 
 void prender_foquitos(void){
-    if((SensorArriba == 1) && (SensorAbajo == 1)){
+    if((SensorArriba == 0) && (SensorAbajo == 0)){
         Garrafon = 1;
         Coca = 0;
     }
     
-    else if (SensorAbajo == 1 && SensorArriba == 0){
+    else if (SensorAbajo == 0 && SensorArriba == 1){
         Coca = 1;
         Garrafon = 0;
     }
@@ -134,12 +134,12 @@ int main(void)
         
         prender_foquitos();
         
-        if((SensorArriba == 1) && (SensorAbajo == 1))
+        if((SensorArriba == 0) && (SensorAbajo == 0))
         {
             delay_astuto();
             posicion_actual = 'B';
         }
-        else if(SensorAbajo == 1)
+        else if(SensorAbajo == 0)
         {
             posicion_actual = 'A';
         }
