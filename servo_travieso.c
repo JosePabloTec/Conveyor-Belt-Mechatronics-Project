@@ -107,11 +107,11 @@ void Init_Ports(void)
     // Servo en RB0
     TRISBbits.TRISB0 = 0; //salida
 
-    // Botones en RD0 y RD1
+    // Sensores en RD0 y RD1
     TRISDbits.TRISD0 = 1;
     TRISDbits.TRISD1 = 1;
     
-    //
+    // LEDs
     TRISBbits.TRISB1 = 0;  // Salida
     TRISBbits.TRISB2 = 0;  // Salida
     TRISBbits.TRISB3 = 0;  // Salida
@@ -130,25 +130,26 @@ void Init_Ports(void)
 void Servo_garrafon(void)
 {
     Servo = 1;
-    
-    __delay_us(1000);      // Aproximadamente 45°
+    // Señal PWM
+    // ¿como se controla un servo? https://www.youtube.com/watch?v=GXHQemuRtWU
+    __delay_us(1833);      // 60°
     Servo = 0;
-    __delay_us(19000);     // Completa 20 ms
+    __delay_us(18167);     // Completa 20 ms
 }
 
 void Servo_coca(void)
 {
     Servo = 1;
     
-    __delay_us(1166);      // Aproximadamente 45°
+    __delay_us(1667);      // 30°
     Servo = 0;
-    __delay_us(18834);     // Completa 20 ms
+    __delay_us(18333);     // Completa 20 ms
 }
 
 void Servo_default(void)
 {
     Servo = 1;
-    __delay_us(1500);      // Aproximadamente 90°
+    __delay_us(1500);      // 0°
     Servo = 0;
     __delay_us(18500);     // Completa 20 ms
 }
@@ -180,12 +181,12 @@ void secuencia_alto(void){
 }
 
 void prender_foquitos(void){
-    if((SensorArriba == 1) && (SensorAbajo == 1)){
+    if((SensorArriba == 0) && (SensorAbajo == 0)){
         Garrafon = 1;
         Coca = 0;
     }
     
-    else if (SensorAbajo == 1 && SensorArriba == 0){
+    else if (SensorAbajo == 0 && SensorArriba == 1){
         Coca = 1;
         Garrafon = 0;
     }
@@ -213,12 +214,12 @@ int main(void)
         
         prender_foquitos();
         
-        if((SensorArriba == 1) && (SensorAbajo == 1))
+        if((SensorArriba == 0) && (SensorAbajo == 0))
         {
             delay_astuto();
             posicion_actual = 'g';
         }
-        else if(SensorAbajo == 1)
+        else if(SensorAbajo == 0)
         {
             posicion_actual = 'c';
         }
@@ -238,5 +239,4 @@ int main(void)
         
     }
 
-    return 0;
 }
